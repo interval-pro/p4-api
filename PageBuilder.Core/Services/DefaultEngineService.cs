@@ -17,7 +17,7 @@ namespace PageBuilder.Core.Services
 
         public async Task<string> GeneratePageAsync(CreatePageModel jsonRequest)
         {
-            var aiApiKey = configuration["aiApiKey"];
+            var apiKey = aiApiKey;
 
             var result = jsonRequest.Input;
 
