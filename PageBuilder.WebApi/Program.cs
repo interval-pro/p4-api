@@ -12,11 +12,15 @@ namespace PageBuilder.WebApi
 
             builder.Services.AddControllers();
 
+            builder.Services.AddHttpClient();
+            
+
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
             builder.Services.AddSingleton<IMainService, MainService>();
             builder.Services.AddSingleton<IEngineFactory, EngineFactory>();
+            builder.Services.AddSingleton<IOpenAiService, OpenAiService>();
 
             builder.Services.AddSingleton<DefaultEngineService>();
             builder.Services.AddSingleton<EngineV2Service>();
