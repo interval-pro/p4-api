@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PageBuilder.Core.Contracts;
@@ -63,11 +64,9 @@ namespace PageBuilder.Core.Services
 
             //Create HTML & CSS for all sections
             string section = string.Empty;
-            string HTML = string.Empty;
-            string CSS = string.Empty;
+            PageContent finalResult = new PageContent() { globalStyle = layoutModel.MainStyle };
             for (int i = 0; i < layoutModel.Sections.Count; i++)
             {
-                string sectionName = layoutModel.SectionsNames[i];
                 section = layoutModel.Sections[i];
                 string sectionResponse = string.Empty;
                 try
@@ -78,14 +77,10 @@ namespace PageBuilder.Core.Services
                 {
                     return x.Message;
                 }
-                PageContent? jsonObject = JsonConvert.DeserializeObject<PageContent>(sectionResponse);
-                HTML += jsonObject.HTML;
-                CSS += jsonObject.CSS;
+                SectionContent? jsonObject = JsonConvert.DeserializeObject<SectionContent>(sectionResponse);
+                finalResult.sections.Add(new SectionContent() { HTML = jsonObject.HTML, CSS = jsonObject.CSS});
             }
             //---- END ----
-
-            //Final Json object
-            PageContent finalResult = new() { HTML = HTML, CSS = CSS };
 
             return JsonConvert.SerializeObject(finalResult);
         }
