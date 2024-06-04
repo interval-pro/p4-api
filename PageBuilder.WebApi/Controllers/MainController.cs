@@ -5,7 +5,7 @@ using PageBuilder.Core.Models;
 
 namespace PageBuilder.WebApi.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/")]
     [ApiController]
     public class MainController : ControllerBase
     {
@@ -45,6 +45,17 @@ namespace PageBuilder.WebApi.Controllers
             // To Do
 
             var result = await mainService.UpdatePageAsync(updateData, currentData);
+
+            return Ok(result);
+
+        }
+
+        [HttpPost("updateImage")]
+        public async Task<IActionResult> UpdateImage()
+        {
+            // To Do
+
+            var result = string.Empty;
 
             return Ok(result);
 
