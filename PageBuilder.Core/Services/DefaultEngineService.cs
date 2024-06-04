@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using PageBuilder.Core.Contracts;
 using PageBuilder.Core.Models;
 
@@ -7,23 +9,85 @@ namespace PageBuilder.Core.Services
     public class DefaultEngineService : IEngineService
     {
         private readonly IConfiguration configuration;
-        private readonly string aiApiKey;
+        private readonly IOpenAiService openAiService;
 
-        public DefaultEngineService(IConfiguration configuration)
+        public DefaultEngineService(
+            IConfiguration configuration,
+            IOpenAiService openAiService)
         {
             this.configuration = configuration;
-            this.aiApiKey = configuration["aiApiKey"];
+            this.openAiService = openAiService;
         }
 
         public async Task<string> GeneratePageAsync(CreatePageModel jsonRequest)
         {
-            var apiKey = aiApiKey;
+            var input = jsonRequest.Input;
 
-            var result = jsonRequest.Input;
+            //Create layout in json
+            string layout = string.Empty;
+            try
+            {
+                layout = await openAiService.CreateLayoutAsync(configuration, input);
+            }
+            catch (Exception x)
+            {
+                return x.Message;
+            }
+            //---- END ----
 
-            // To Do: logic to generate the page with DefaultEngine
+            //Deserialize layout
+            JObject outObject = null!;
+            try
+            {
+                outObject = JObject.Parse(layout);
+            }
+            catch (Exception x)
+            {
+                return x.Message;
+            }
+            var layoutModel = new
+            {
+                Inputs = outObject["inputs"].ToString(),
+                MainStyle = outObject["mainStyle"].ToString(),
+                SectionsNames = outObject["sections"].Values("sectionId")
+                .Select(x => x.ToString())
+                .ToList(),
+                Sections = outObject["sections"]
+                .Select(x => x.ToString())
+                .ToList(),
+                Components = outObject["sections"].Values("components").Values()
+                .Select(x => x.ToString())
+                .ToList()
+            };
+            //---- END ----
 
-            return result;
+            //Create HTML & CSS for all sections
+            string section = string.Empty;
+            string HTML = string.Empty;
+            string CSS = string.Empty;
+            for (int i = 0; i < layoutModel.Sections.Count; i++)
+            {
+                string sectionName = layoutModel.SectionsNames[i];
+                section = layoutModel.Sections[i];
+                string sectionResponse = string.Empty;
+                try
+                {
+                    sectionResponse = await openAiService.CreateSectionAsync(configuration, input, section);
+                }
+                catch (Exception x)
+                {
+                    return x.Message;
+                }
+                PageContent? jsonObject = JsonConvert.DeserializeObject<PageContent>(sectionResponse);
+                HTML += jsonObject.HTML;
+                CSS += jsonObject.CSS;
+            }
+            //---- END ----
+
+            //Final Json object
+            PageContent finalResult = new() { HTML = HTML, CSS = CSS };
+
+            return JsonConvert.SerializeObject(finalResult);
         }
 
         public async Task<string> UpdatePageAsync(UpdatePageModel updateData, CreatePageModel currentData)

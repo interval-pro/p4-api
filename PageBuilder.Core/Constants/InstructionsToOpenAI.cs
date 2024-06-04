@@ -1,0 +1,29 @@
+﻿namespace PageBuilder.Core.Constants
+{
+    public static class InstructionsToOpenAI
+    {
+        public const string botRole = @"You are a Front-end Web Developer. 
+        Your task is to assist me in building an aesthetically pleasing landing page.";
+
+        public const string botLayoutInstructions = @"Instructions:
+        If there is image for generating please use GIFP(""__human readable text describing the image - prompt for image__"")
+        At least 5 sections. Please Respond in fallowing json format:
+        {""inputs"":""__inputs_from_prompt__ as human readable text""
+        ""mainStyle:""__CSS_style_for_body_and_html_tags_in_css_code__""
+        ""sections"": [{sectionId: ""header""
+        ""components: [{componentId: ""logo"",  type: ""image"", content: ""GIFP(""..."")""},
+        ""{componentId: ""navbar"", type: ""..."", content: ""5 links: Home, about us, ....""},... ]}, ...]}";
+
+        public const string botSectionInstructions = @"Instructions:  
+        Use provided Section Information as raw simple referance and generate detailed section content. 
+        Use input as main referance for all sections.   
+        You can use any css properties. 
+        For better deisgn you can use border-radius, background gradient, box-shadow, hover effects, animations etc..  
+        Reduce new lines between tags and styles in the code (minify). 
+        Procide only HTML and CSS style for current section.  
+        Replace the imagesURL with: https://dummyimage.com/{width}x{heigh}/{color_hex} (width relative width,height, color)   
+        Please Respond in the following JSON format:
+        { ""HTML"": ""<_section_tag_></_section_tag_>"" , ""CSS"": ""_the_css_style_"" }
+        Generete it as detailed as possible";
+    }
+}
