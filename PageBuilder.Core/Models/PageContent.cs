@@ -1,8 +1,12 @@
-﻿namespace PageBuilder.Core.Models
+﻿using System.Text.Json.Serialization;
+
+namespace PageBuilder.Core.Models
 {
     public class PageContent
     {
-        public string HTML { get; set; } = null!;
-        public string CSS { get; set; } = null!;
+        [JsonPropertyName("globalStyle")]
+        public string? globalStyle { get; set; }
+        [JsonPropertyName("sections")]
+        public ICollection<SectionContent> sections { get; set; } = new List<SectionContent>();
     }
 }
