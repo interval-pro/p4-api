@@ -89,7 +89,15 @@ namespace PageBuilder.Core.Services
             var completionResponse = httpResponse.IsSuccessStatusCode ? JsonSerializer.Deserialize<ChatCompletionResponse>(await httpResponse.Content.ReadAsStringAsync()) : null;
             string result = completionResponse.Choices?[0]?.Message?.Content;
 
-            return result.Substring(result.IndexOf('{'), result.LastIndexOf("```") - result.IndexOf('{') - 1);
+            var startIndex = result.IndexOf('{');
+            var endIndex = result.LastIndexOf("```");
+
+            if (startIndex > -1 && endIndex > -1 && endIndex > startIndex)
+            {
+                return result.Substring(startIndex, endIndex - startIndex - 1);
+            }
+
+            return string.Empty;
         }
 
         public async Task<string> CreateSectionAsync(IConfiguration configuration, string question, string section)
@@ -141,6 +149,11 @@ namespace PageBuilder.Core.Services
             httpResponse.EnsureSuccessStatusCode();
 
             var completionResponse = httpResponse.IsSuccessStatusCode ? JsonSerializer.Deserialize<ChatCompletionResponse>(await httpResponse.Content.ReadAsStringAsync()) : null;
+            if (completionResponse == null)
+            {
+                return string.Empty;
+            }
+
             string result = completionResponse.Choices?[0]?.Message?.Content;
 
             return result.Replace("```json", "").Replace("```", "");
@@ -168,7 +181,7 @@ namespace PageBuilder.Core.Services
                             Content = question
                         }
                 }
-                
+
             };
 
             using var httpReq = new HttpRequestMessage(HttpMethod.Post, "https://api.openai.com/v1/chat/completions");
