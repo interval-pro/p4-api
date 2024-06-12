@@ -18,12 +18,13 @@ namespace PageBuilder.WebApi
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-            builder.Services.AddSingleton<IMainService, MainService>();
-            builder.Services.AddSingleton<IEngineFactory, EngineFactory>();
-            builder.Services.AddSingleton<IOpenAiService, OpenAiService>();
+            builder.Services.AddScoped<IMainService, MainService>();
+            builder.Services.AddScoped<IEngineFactory, EngineFactory>();
+            builder.Services.AddScoped<IOpenAiService, OpenAiService>();
+            builder.Services.AddScoped<IRetryPolicyService, RetryPolicyService>();
 
-            builder.Services.AddSingleton<DefaultEngineService>();
-            builder.Services.AddSingleton<EngineV2Service>();
+            builder.Services.AddScoped<DefaultEngineService>();
+            builder.Services.AddScoped<EngineV2Service>();
 
             builder.Services.AddCors(options =>
             {

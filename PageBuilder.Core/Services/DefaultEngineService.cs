@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PageBuilder.Core.Contracts;
@@ -11,24 +10,65 @@ namespace PageBuilder.Core.Services
     {
         private readonly IConfiguration configuration;
         private readonly IOpenAiService openAiService;
+        private readonly IRetryPolicyService retryPolicy;
 
         public DefaultEngineService(
             IConfiguration configuration,
-            IOpenAiService openAiService)
+            IOpenAiService openAiService,
+            IRetryPolicyService retryPolicy)
         {
             this.configuration = configuration;
             this.openAiService = openAiService;
+            this.retryPolicy = retryPolicy;
+        }
+
+        public async Task<string> GenerateImageAsync(CreatePageModel jsonRequest)
+        {
+            var input = jsonRequest.Input;
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                return "Invalid input.";
+            }
+            
+            string imageUrl = string.Empty;
+
+            //Generate Image with DALL-E-3
+            try
+            {
+                imageUrl = await retryPolicy.ExecuteImageWithRetryAsync(() => openAiService.CreateImageFromTextAsync(configuration, input));
+                
+                if (string.IsNullOrEmpty(imageUrl))
+                {
+                    return "Failed to generate image";
+                }
+            }
+            catch (Exception x)
+            {
+                return x.Message;
+            }
+            //---- END ----
+
+            return JsonConvert.SerializeObject(new {url = imageUrl});
         }
 
         public async Task<string> GeneratePageAsync(CreatePageModel jsonRequest)
         {
             var input = jsonRequest.Input;
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                return "Invalid input.";
+            }
 
             //Create layout in json
             string layout = string.Empty;
             try
             {
-                layout = await openAiService.CreateLayoutAsync(configuration, input);
+                layout = await retryPolicy.ExecuteLayoutWithRetryAsync(() => openAiService.CreateLayoutAsync(configuration, input));
+
+                if (string.IsNullOrEmpty(layout))
+                {
+                    return "Failed to generate layout";
+                }
             }
             catch (Exception x)
             {
@@ -71,18 +111,28 @@ namespace PageBuilder.Core.Services
                 string sectionResponse = string.Empty;
                 try
                 {
-                    sectionResponse = await openAiService.CreateSectionAsync(configuration, input, section);
+                    sectionResponse = await retryPolicy.ExecuteSectionWithRetryAsync(() => openAiService.CreateSectionAsync(configuration, input, section));
+                    
+                    if (string.IsNullOrEmpty(sectionResponse))
+                    {
+                        return "Failed to generate section";
+                    }
                 }
                 catch (Exception x)
                 {
                     return x.Message;
                 }
                 SectionContent? jsonObject = JsonConvert.DeserializeObject<SectionContent>(sectionResponse);
-                finalResult.sections.Add(new SectionContent() { HTML = jsonObject.HTML, CSS = jsonObject.CSS});
+                finalResult.sections.Add(new SectionContent() { HTML = jsonObject.HTML, CSS = jsonObject.CSS });
             }
             //---- END ----
 
             return JsonConvert.SerializeObject(finalResult);
+        }
+
+        public Task<string> ImageColorExtractAsync(CreatePageModel jsonRequest)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task<string> UpdatePageAsync(UpdatePageModel updateData, CreatePageModel currentData)
