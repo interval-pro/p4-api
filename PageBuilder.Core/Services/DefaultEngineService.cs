@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PageBuilder.Core.Contracts;
@@ -11,24 +10,36 @@ namespace PageBuilder.Core.Services
     {
         private readonly IConfiguration configuration;
         private readonly IOpenAiService openAiService;
+        private readonly IRetryPolicyService retryPolicy;
 
         public DefaultEngineService(
             IConfiguration configuration,
-            IOpenAiService openAiService)
+            IOpenAiService openAiService,
+            IRetryPolicyService retryPolicy)
         {
             this.configuration = configuration;
             this.openAiService = openAiService;
+            this.retryPolicy = retryPolicy;
         }
 
         public async Task<string> GeneratePageAsync(CreatePageModel jsonRequest)
         {
             var input = jsonRequest.Input;
+            if (string.IsNullOrEmpty(input) || string.IsNullOrWhiteSpace(input))
+            {
+                return "Invalid input.";
+            }
 
             //Create layout in json
             string layout = string.Empty;
             try
             {
-                layout = await openAiService.CreateLayoutAsync(configuration, input);
+                layout = await retryPolicy.ExecuteLayoutWithRetryAsync(() => openAiService.CreateLayoutAsync(configuration, input));
+
+                if (string.IsNullOrEmpty(layout))
+                {
+                    return "Failed to generate layout";
+                }
             }
             catch (Exception x)
             {
@@ -71,14 +82,19 @@ namespace PageBuilder.Core.Services
                 string sectionResponse = string.Empty;
                 try
                 {
-                    sectionResponse = await openAiService.CreateSectionAsync(configuration, input, section);
+                    sectionResponse = await retryPolicy.ExecuteSectionWithRetryAsync(() => openAiService.CreateSectionAsync(configuration, input, section));
+                    
+                    if (string.IsNullOrEmpty(sectionResponse))
+                    {
+                        return "Failed to generate section";
+                    }
                 }
                 catch (Exception x)
                 {
                     return x.Message;
                 }
                 SectionContent? jsonObject = JsonConvert.DeserializeObject<SectionContent>(sectionResponse);
-                finalResult.sections.Add(new SectionContent() { HTML = jsonObject.HTML, CSS = jsonObject.CSS});
+                finalResult.sections.Add(new SectionContent() { HTML = jsonObject.HTML, CSS = jsonObject.CSS });
             }
             //---- END ----
 
