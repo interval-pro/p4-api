@@ -15,6 +15,11 @@ namespace PageBuilder.Core.Services
             this.aiApiKey = configuration["aiApiKey"];
         }
 
+        public Task<string> GenerateImageAsync(CreatePageModel jsonRequest)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<string> GeneratePageAsync(CreatePageModel jsonRequest)
         {
             var apiKey = aiApiKey;
@@ -24,6 +29,11 @@ namespace PageBuilder.Core.Services
             // To Do: logic to generate the page with EngineV2
 
             return result;
+        }
+
+        public Task<string> ImageColorExtractAsync(CreatePageModel jsonRequest)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task<string> UpdatePageAsync(UpdatePageModel updateData, CreatePageModel currentData)
