@@ -84,15 +84,15 @@ namespace PageBuilder.Core.Models
         public class TextToImageRequest
         {
             [JsonPropertyName("model")]
-            public string? Model { get; set; }
+            public string Model { get; set; } = null!;
             [JsonPropertyName("prompt")]
-            public string? Prompt { get; set; }
+            public string Prompt { get; set; } = string.Empty;
             [JsonPropertyName("n")]
             public int N { get; set; } //You can request 1 image at a time with DALL·E 3 (request more by making parallel requests) or up to 10 images at a time using DALL·E 2
             [JsonPropertyName("size")]
             public string? Size { get; set; } //When using DALL·E 3, images can have a size of 1024x1024, 1024x1792 or 1792x1024 pixels.
-            [JsonPropertyName("quality")]
-            public string? Quality { get; set; } //By default, images are generated at standard quality, but when using DALL·E 3 you can set quality: "hd" for enhanced detail. Square, standard quality images are the fastest to generate.
+            [JsonPropertyName("response_format")]
+            public string? ResponseFormat { get; set; } //The format in which the generated images are returned. Must be one of url or b64_json. URLs are only valid for 60 minutes after the image has been generated.
         }
 
         public class Data

@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using Polly;
 using Polly.Retry;
-
 using PageBuilder.Core.Contracts;
 using static PageBuilder.Core.Constants.GeneralConstants;
 
@@ -11,6 +10,7 @@ namespace PageBuilder.Core.Services
     {
         private readonly AsyncRetryPolicy<string> layoutRetryPolicy;
         private readonly AsyncRetryPolicy<string> sectionRetryPolicy;
+        private readonly AsyncRetryPolicy<string> imageRetryPolicy;
 
         public RetryPolicyService()
         {
@@ -25,6 +25,24 @@ namespace PageBuilder.Core.Services
                 .WaitAndRetryAsync(
                    retryCount: 5,
                    sleepDurationProvider: attempt => TimeSpan.FromSeconds(Math.Min(MaxDurationInSeconds, Math.Pow(2, attempt))));
+
+            imageRetryPolicy = Policy.HandleInner<HttpRequestException>()
+                .OrResult<string>(res => !IsValidImage(res))
+                .WaitAndRetryAsync(
+                   retryCount: 5,
+                   sleepDurationProvider: attempt => TimeSpan.FromSeconds(Math.Min(MaxDurationInSeconds, Math.Pow(2, attempt))));
+        }
+
+        public async Task<string> ExecuteImageWithRetryAsync(Func<Task<string>> action)
+        {
+            var result = await imageRetryPolicy.ExecuteAsync(action);
+
+            if (!IsValidImage(result))
+            {
+                return string.Empty;
+            }
+
+            return result;
         }
 
         public async Task<string> ExecuteLayoutWithRetryAsync(Func<Task<string>> action)
@@ -49,6 +67,16 @@ namespace PageBuilder.Core.Services
             }
 
             return result;
+        }
+
+        private bool IsValidImage(string result)
+        {
+            if (string.IsNullOrWhiteSpace(result))
+            {
+                return false;
+            }
+
+            return true;
         }
 
         private bool IsValidLayout(string result)

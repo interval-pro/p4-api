@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using PageBuilder.Core.Contracts;
 using PageBuilder.Core.Models;
+using System.Drawing;
 
 namespace PageBuilder.WebApi.Controllers
 {
@@ -19,7 +20,6 @@ namespace PageBuilder.WebApi.Controllers
         [HttpPost("generate")]
         public async Task<IActionResult> Generate([FromBody] CreatePageModel jsonRequest)
         {
-            // To Do
             if (jsonRequest == null)
             {
                 return BadRequest("Invalid Data");
@@ -59,6 +59,46 @@ namespace PageBuilder.WebApi.Controllers
 
             return Ok(result);
 
+        }
+
+        [HttpPost("imageColorsExtract")]
+        public async Task<IActionResult> ImageColorsExtract([FromBody] CreatePageModel jsonRequest)
+        {
+            if (jsonRequest == null)
+            {
+                return BadRequest("Invalid Data");
+            }
+
+            try
+            {
+                var result = await mainService.ImageColorExtractAsync(jsonRequest);
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        [HttpPost("imageGenerator")]
+        public async Task<IActionResult> ImageGenerator([FromBody] CreatePageModel jsonRequest)
+        {
+            if (jsonRequest == null)
+            {
+                return BadRequest("Invalid Data");
+            }
+
+            try
+            {
+                var result = await mainService.GenerateImageAsync(jsonRequest);
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
     }
 }
