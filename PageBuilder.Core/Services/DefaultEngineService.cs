@@ -22,10 +22,39 @@ namespace PageBuilder.Core.Services
             this.retryPolicy = retryPolicy;
         }
 
+        public async Task<string> GenerateImageAsync(CreatePageModel jsonRequest)
+        {
+            var input = jsonRequest.Input;
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                return "Invalid input.";
+            }
+            
+            string imageUrl = string.Empty;
+
+            //Generate Image with DALL-E-3
+            try
+            {
+                imageUrl = await retryPolicy.ExecuteImageWithRetryAsync(() => openAiService.CreateImageFromTextAsync(configuration, input));
+                
+                if (string.IsNullOrEmpty(imageUrl))
+                {
+                    return "Failed to generate image";
+                }
+            }
+            catch (Exception x)
+            {
+                return x.Message;
+            }
+            //---- END ----
+
+            return JsonConvert.SerializeObject(new {url = imageUrl});
+        }
+
         public async Task<string> GeneratePageAsync(CreatePageModel jsonRequest)
         {
             var input = jsonRequest.Input;
-            if (string.IsNullOrEmpty(input) || string.IsNullOrWhiteSpace(input))
+            if (string.IsNullOrWhiteSpace(input))
             {
                 return "Invalid input.";
             }
@@ -99,6 +128,11 @@ namespace PageBuilder.Core.Services
             //---- END ----
 
             return JsonConvert.SerializeObject(finalResult);
+        }
+
+        public Task<string> ImageColorExtractAsync(CreatePageModel jsonRequest)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task<string> UpdatePageAsync(UpdatePageModel updateData, CreatePageModel currentData)
