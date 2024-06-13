@@ -27,7 +27,7 @@ namespace PageBuilder.Core.Services
                 N = 1,
                 Prompt = question,
                 Size = "1792x1024",
-                Quality = "standard"
+                ResponseFormat = "url"
             };
 
             using var httpReq = new HttpRequestMessage(HttpMethod.Post, "https://api.openai.com/v1/images/generations");
