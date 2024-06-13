@@ -12,10 +12,21 @@ namespace PageBuilder.Core.Services
             this.engineFactory = engineFactory;
         }
 
+        public async Task<string> GenerateImageAsync(CreatePageModel jsonRequest)
+        {
+            var engine = engineFactory.GetEngine(jsonRequest.EngineType);
+            if (engine == null)
+            {
+                throw new ArgumentNullException("The engine can not be null!");
+            }
+
+            var result = await engine.GenerateImageAsync(jsonRequest);
+
+            return result;
+        }
+
         public async Task<string> GeneratePageAsync(CreatePageModel jsonRequest)
         {
-            //To Do
-            
             var engine = engineFactory.GetEngine(jsonRequest.EngineType);
             if (engine == null)
             {
@@ -23,6 +34,19 @@ namespace PageBuilder.Core.Services
             }
 
             var result = await engine.GeneratePageAsync(jsonRequest);
+
+            return result;
+        }
+
+        public async Task<string> ImageColorExtractAsync(CreatePageModel jsonRequest)
+        {
+            var engine = engineFactory.GetEngine(jsonRequest.EngineType);
+            if (engine == null)
+            {
+                throw new ArgumentNullException("The engine can not be null!");
+            }
+
+            var result = await engine.ImageColorExtractAsync(jsonRequest);
 
             return result;
         }
