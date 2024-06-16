@@ -1,53 +1,77 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using PageBuilder.Core.Contracts;
+using PageBuilder.Core.Enums;
 using PageBuilder.Core.Models;
-using System.Drawing;
+using PageBuilder.Core.Models.ComponentModels;
 
 namespace PageBuilder.WebApi.Controllers
 {
-    [Route("api/")]
+    [Route("/")]
     [ApiController]
     public class MainController : ControllerBase
     {
-        private readonly IMainService mainService;
+        private readonly IEngineFactory engineFactory;
 
-        public MainController(IMainService mainService)
+        public MainController(IEngineFactory engineFactory)
         {
-            this.mainService = mainService;
+            this.engineFactory = engineFactory;
         }
 
-        [HttpPost("generate")]
-        public async Task<IActionResult> Generate([FromBody] CreatePageModel jsonRequest)
+        [HttpPost("generateLayout")]
+        public async Task<IActionResult> GenerateLayoutAsync([FromBody] CreateLayoutModel inputs, [FromQuery] int engineType)
         {
-            if (jsonRequest == null)
+            if (engineType < 0 || engineType > 1)
             {
-                return BadRequest("Invalid Data");
+                return BadRequest("Invalid Engine type");
             }
 
             try
             {
-                var result = await mainService.GeneratePageAsync(jsonRequest);
+                EngineType en = (EngineType)engineType;
+
+                var engine = engineFactory.GetEngine(en);
+                var result = await engine.GenerateLayoutAsync(inputs);
+
+                if (result == null)
+                {
+                    return BadRequest();
+                }
 
                 return Ok(result);
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                return BadRequest(ex.Message);
             }
 
         }
 
-
-        [HttpPost("update")]
-        public async Task<IActionResult> Update([FromQuery] UpdatePageModel updateData, CreatePageModel currentData)
+        [HttpPost("generateSection")]
+        public async Task<IActionResult> GenerateSectionAsync([FromBody] AdintionalSectionModel sectionModel, [FromQuery] int engineType)
         {
-            // To Do
+            if (engineType < 0 || engineType > 1)
+            {
+                return BadRequest("Invalid Engine type");
+            }
 
-            var result = await mainService.UpdatePageAsync(updateData, currentData);
+            try
+            {
+                EngineType en = (EngineType)engineType;
 
-            return Ok(result);
+                var engine = engineFactory.GetEngine(en);
+                var result = await engine.GenerateSectionAsync(sectionModel);
 
+                if (result == null)
+                {
+                    return BadRequest();
+                }
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpPost("updateImage")]
@@ -62,42 +86,58 @@ namespace PageBuilder.WebApi.Controllers
         }
 
         [HttpPost("imageColorsExtract")]
-        public async Task<IActionResult> ImageColorsExtract([FromBody] CreatePageModel jsonRequest)
+        public async Task<IActionResult> ImageColorsExtract([FromBody] CreateLayoutModel input, [FromQuery] int engineType)
         {
-            if (jsonRequest == null)
+            if (engineType < 0 || engineType > 1)
             {
-                return BadRequest("Invalid Data");
+                return BadRequest("Invalid Engine type");
             }
 
             try
             {
-                var result = await mainService.ImageColorExtractAsync(jsonRequest);
+                EngineType en = (EngineType)engineType;
+
+                var engine = engineFactory.GetEngine(en);
+                var result = await engine.ImageColorExtractAsync(input);
+
+                if (result == null)
+                {
+                    return BadRequest();
+                }
 
                 return Ok(result);
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                return BadRequest(ex.Message);
             }
         }
 
         [HttpPost("imageGenerator")]
-        public async Task<IActionResult> ImageGenerator([FromBody] CreatePageModel jsonRequest)
+        public async Task<IActionResult> ImageGenerator([FromBody] CreateLayoutModel input, [FromQuery] int engineType)
         {
-            if (jsonRequest == null)
+            if (engineType < 0 || engineType > 1)
             {
-                return BadRequest("Invalid Data");
+                return BadRequest("Invalid Engine type");
             }
 
             try
             {
-                var result = await mainService.GenerateImageAsync(jsonRequest);
+                EngineType en = (EngineType)engineType;
+
+                var engine = engineFactory.GetEngine(en);
+                var result = await engine.GenerateImageAsync(input);
+
+                if (result == null)
+                {
+                    return BadRequest();
+                }
 
                 return Ok(result);
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                return BadRequest(ex.Message);
             }
         }
     }

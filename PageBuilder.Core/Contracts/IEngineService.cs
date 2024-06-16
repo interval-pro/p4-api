@@ -1,15 +1,16 @@
 ﻿using PageBuilder.Core.Models;
+using PageBuilder.Core.Models.ComponentModels;
 
 namespace PageBuilder.Core.Contracts
 {
     public interface IEngineService
     {
-        Task<string> GenerateImageAsync(CreatePageModel jsonRequest);
+        Task<string> GenerateImageAsync(CreateLayoutModel jsonRequest);
         
-        Task<string> GeneratePageAsync(CreatePageModel jsonRequest);
+        Task<LayoutModel?> GenerateLayoutAsync(CreateLayoutModel inputs);
 
-        Task<string> ImageColorExtractAsync(CreatePageModel jsonRequest);
+        Task<SectionContent?> GenerateSectionAsync(AdintionalSectionModel sectionModel);
 
-        Task<string> UpdatePageAsync(UpdatePageModel updateData, CreatePageModel currentData);
+        Task<string> ImageColorExtractAsync(CreateLayoutModel jsonRequest);
     }
 }
