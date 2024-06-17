@@ -30,7 +30,7 @@ namespace PageBuilder.Core.Services
             return null;
         }
 
-        public Task<SectionContent?> GenerateSectionAsync(AdintionalSectionModel sectionModel)
+        public Task<SectionContent?> GenerateSectionAsync(AdditionalSectionModel sectionModel)
         {
             throw new NotImplementedException();
         }

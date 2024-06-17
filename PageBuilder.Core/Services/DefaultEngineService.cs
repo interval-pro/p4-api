@@ -56,10 +56,6 @@ namespace PageBuilder.Core.Services
         public async Task<LayoutModel?> GenerateLayoutAsync(CreateLayoutModel request)
         {
             var input = request.Input;
-            if (string.IsNullOrWhiteSpace(input))
-            {
-                return null;
-            }
 
             string layout = string.Empty;
             try
@@ -81,7 +77,7 @@ namespace PageBuilder.Core.Services
             return layoutModel;
         }
   
-        public async Task<SectionContent?> GenerateSectionAsync(AdintionalSectionModel sectionModel)
+        public async Task<SectionContent?> GenerateSectionAsync(AdditionalSectionModel sectionModel)
         {
             var section = JsonConvert.SerializeObject(sectionModel);
 
