@@ -6,6 +6,7 @@ namespace PageBuilder.Core.Models
     {
         [JsonPropertyName("HTML")]
         public string HTML { get; set; } = string.Empty;
+
         [JsonPropertyName("CSS")]
         public string CSS { get; set; } = string.Empty;
     }

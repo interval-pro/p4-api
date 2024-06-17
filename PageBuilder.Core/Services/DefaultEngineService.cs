@@ -3,6 +3,8 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PageBuilder.Core.Contracts;
 using PageBuilder.Core.Models;
+using PageBuilder.Core.Models.ComponentModels;
+
 
 namespace PageBuilder.Core.Services
 {
@@ -22,21 +24,21 @@ namespace PageBuilder.Core.Services
             this.retryPolicy = retryPolicy;
         }
 
-        public async Task<string> GenerateImageAsync(CreatePageModel jsonRequest)
+        public async Task<string> GenerateImageAsync(CreateLayoutModel jsonRequest)
         {
             var input = jsonRequest.Input;
             if (string.IsNullOrWhiteSpace(input))
             {
                 return "Invalid input.";
             }
-            
+
             string imageUrl = string.Empty;
 
             //Generate Image with DALL-E-3
             try
             {
                 imageUrl = await retryPolicy.ExecuteImageWithRetryAsync(() => openAiService.CreateImageFromTextAsync(configuration, input));
-                
+
                 if (string.IsNullOrEmpty(imageUrl))
                 {
                     return "Failed to generate image";
@@ -48,18 +50,17 @@ namespace PageBuilder.Core.Services
             }
             //---- END ----
 
-            return JsonConvert.SerializeObject(new {url = imageUrl});
+            return JsonConvert.SerializeObject(new { url = imageUrl });
         }
 
-        public async Task<string> GeneratePageAsync(CreatePageModel jsonRequest)
+        public async Task<LayoutModel?> GenerateLayoutAsync(CreateLayoutModel request)
         {
-            var input = jsonRequest.Input;
+            var input = request.Input;
             if (string.IsNullOrWhiteSpace(input))
             {
-                return "Invalid input.";
+                return null;
             }
 
-            //Create layout in json
             string layout = string.Empty;
             try
             {
@@ -67,81 +68,66 @@ namespace PageBuilder.Core.Services
 
                 if (string.IsNullOrEmpty(layout))
                 {
-                    return "Failed to generate layout";
+                    return null;
                 }
             }
-            catch (Exception x)
+            catch (Exception)
             {
-                return x.Message;
+                return null;
             }
-            //---- END ----
 
-            //Deserialize layout
-            JObject outObject = null!;
-            try
-            {
-                outObject = JObject.Parse(layout);
-            }
-            catch (Exception x)
-            {
-                return x.Message;
-            }
-            var layoutModel = new
-            {
-                Inputs = outObject["inputs"].ToString(),
-                MainStyle = outObject["mainStyle"].ToString(),
-                SectionsNames = outObject["sections"].Values("sectionId")
-                .Select(x => x.ToString())
-                .ToList(),
-                Sections = outObject["sections"]
-                .Select(x => x.ToString())
-                .ToList(),
-                Components = outObject["sections"].Values("components").Values()
-                .Select(x => x.ToString())
-                .ToList()
-            };
-            //---- END ----
+            LayoutModel? layoutModel = ParseLayout(layout, input);
 
-            //Create HTML & CSS for all sections
-            string section = string.Empty;
-            PageContent finalResult = new PageContent() { globalStyle = layoutModel.MainStyle };
-            for (int i = 0; i < layoutModel.Sections.Count; i++)
-            {
-                section = layoutModel.Sections[i];
-                string sectionResponse = string.Empty;
-                try
-                {
-                    sectionResponse = await retryPolicy.ExecuteSectionWithRetryAsync(() => openAiService.CreateSectionAsync(configuration, input, section));
-                    
-                    if (string.IsNullOrEmpty(sectionResponse))
-                    {
-                        return "Failed to generate section";
-                    }
-                }
-                catch (Exception x)
-                {
-                    return x.Message;
-                }
-                SectionContent? jsonObject = JsonConvert.DeserializeObject<SectionContent>(sectionResponse);
-                finalResult.sections.Add(new SectionContent() { HTML = jsonObject.HTML, CSS = jsonObject.CSS });
-            }
-            //---- END ----
+            return layoutModel;
+        }
+  
+        public async Task<SectionContent?> GenerateSectionAsync(AdintionalSectionModel sectionModel)
+        {
+            var section = JsonConvert.SerializeObject(sectionModel);
 
-            return JsonConvert.SerializeObject(finalResult);
+            string sectionResponse = await retryPolicy.ExecuteSectionWithRetryAsync(() => openAiService.CreateSectionAsync(configuration, sectionModel.InitialInputs, section));
+
+            if (string.IsNullOrEmpty(sectionResponse))
+            {
+                return null;
+            }
+
+            var result = JsonConvert.DeserializeObject<SectionContent>(sectionResponse);
+
+            return result;
         }
 
-        public Task<string> ImageColorExtractAsync(CreatePageModel jsonRequest)
+        public Task<string> ImageColorExtractAsync(CreateLayoutModel jsonRequest)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<string> UpdatePageAsync(UpdatePageModel updateData, CreatePageModel currentData)
+        private static LayoutModel? ParseLayout(string layout, string input)
         {
-            // To Do: logic to update the page with DefaultEngine
+            var obj = JObject.Parse(layout);
 
-            currentData.Input = updateData.Input;
+            if (obj != null)
+            {
+                var layoutModel = new LayoutModel()
+                {
+                    Inputs = input,
+                    MainStyle = obj["mainStyle"]?.ToString(),
+                    Sections = obj["sections"]?.Select(s => new SectionModel()
+                    {
+                        SectionId = s["sectionId"]?.ToString(),
+                        Components = s["components"]?.Select(c => new ComponentModel()
+                        {
+                            ComponentId = c["componentId"]?.ToString(),
+                            Type = c["type"]?.ToString(),
+                            Content = c["content"]?.ToString()
+                        }).ToList()
+                    }).ToList()
+                };
 
-            return currentData.Input;
+                return layoutModel;
+            }
+
+            return null;
         }
     }
 }

@@ -18,7 +18,6 @@ namespace PageBuilder.WebApi
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-            builder.Services.AddScoped<IMainService, MainService>();
             builder.Services.AddScoped<IEngineFactory, EngineFactory>();
             builder.Services.AddScoped<IOpenAiService, OpenAiService>();
             builder.Services.AddScoped<IRetryPolicyService, RetryPolicyService>();

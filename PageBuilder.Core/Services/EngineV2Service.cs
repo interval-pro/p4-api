@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using PageBuilder.Core.Contracts;
 using PageBuilder.Core.Models;
+using PageBuilder.Core.Models.ComponentModels;
 
 namespace PageBuilder.Core.Services
 {
@@ -15,34 +16,28 @@ namespace PageBuilder.Core.Services
             this.aiApiKey = configuration["aiApiKey"];
         }
 
-        public Task<string> GenerateImageAsync(CreatePageModel jsonRequest)
+        public Task<string> GenerateImageAsync(CreateLayoutModel jsonRequest)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<string> GeneratePageAsync(CreatePageModel jsonRequest)
+        public Task<LayoutModel?> GenerateLayoutAsync(CreateLayoutModel jsonRequest)
         {
             var apiKey = aiApiKey;
 
-            var result = jsonRequest.Input;
-
             // To Do: logic to generate the page with EngineV2
 
-            return result;
+            return null;
         }
 
-        public Task<string> ImageColorExtractAsync(CreatePageModel jsonRequest)
+        public Task<SectionContent?> GenerateSectionAsync(AdintionalSectionModel sectionModel)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<string> UpdatePageAsync(UpdatePageModel updateData, CreatePageModel currentData)
+        public Task<string> ImageColorExtractAsync(CreateLayoutModel jsonRequest)
         {
-            // To Do: logic to update the page with EngineV2
-
-            var result = string.Empty;  
-
-            return result;
+            throw new NotImplementedException();
         }
     }
 }

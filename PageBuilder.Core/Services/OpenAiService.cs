@@ -1,13 +1,9 @@
 ﻿using Microsoft.Extensions.Configuration;
 using PageBuilder.Core.Contracts;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.Net;
 using System.Text;
 using System.Text.Json;
-using static PageBuilder.Core.Models.ChatGPT;
 using static PageBuilder.Core.Constants.InstructionsToOpenAI;
-
+using static PageBuilder.Core.Models.ChatGPT;
 namespace PageBuilder.Core.Services
 {
     public class OpenAiService : IOpenAiService
@@ -100,6 +96,8 @@ namespace PageBuilder.Core.Services
             return string.Empty;
         }
 
+       
+
         public async Task<string> CreateSectionAsync(IConfiguration configuration, string question, string section)
         {
             IHttpClientFactory? httpClientFactory = null;
@@ -157,62 +155,6 @@ namespace PageBuilder.Core.Services
             string result = completionResponse.Choices?[0]?.Message?.Content;
 
             return result.Replace("```json", "").Replace("```", "");
-        }
-
-        public async Task<string> GetChatCompletionAsync(IConfiguration configuration, string question)
-        {
-            IHttpClientFactory? httpClientFactory = null;
-            HttpClient httpClient = new HttpClient();
-
-            if (httpClientFactory != null)
-            {
-                httpClient = httpClientFactory.CreateClient("ChatGPT");
-            }
-
-            ChatCompletionRequest completionRequest = new()
-            {
-                Model = "gpt-4o",
-                MaxTokens = 2000,
-                Messages =
-                {
-                    new Message()
-                        {
-                            Role = "user",
-                            Content = question
-                        }
-                }
-
-            };
-
-            using var httpReq = new HttpRequestMessage(HttpMethod.Post, "https://api.openai.com/v1/chat/completions");
-            httpReq.Headers.Add("Authorization", $"Bearer {configuration["aiApiKey"]}");
-
-            string requestString = JsonSerializer.Serialize(completionRequest);
-            httpReq.Content = new StringContent(requestString, Encoding.UTF8, "application/json");
-
-            using HttpResponseMessage? httpResponse = await httpClient.SendAsync(httpReq);
-            httpResponse.EnsureSuccessStatusCode();
-
-            var completionResponse = httpResponse.IsSuccessStatusCode ? JsonSerializer.Deserialize<ChatCompletionResponse>(await httpResponse.Content.ReadAsStringAsync()) : null;
-
-            return completionResponse.Choices?[0]?.Message?.Content;
-        }
-
-        public void SaveImage(string imageUrl, string filename, ImageFormat format)
-        {
-            using (WebClient client = new WebClient())
-            {
-                Stream stream = client.OpenRead(imageUrl);
-                Bitmap bitmap = new Bitmap(stream);
-
-                if (bitmap != null)
-                {
-                    bitmap.Save(filename, format);
-                }
-
-                stream.Flush();
-                stream.Close();
-            }
         }
     }
 }
