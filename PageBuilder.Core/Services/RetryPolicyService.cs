@@ -18,19 +18,19 @@ namespace PageBuilder.Core.Services
             .OrResult<string>(res => !IsValidLayout(res))
             .WaitAndRetryAsync(
                 retryCount: 5,
-                sleepDurationProvider: attempt => TimeSpan.FromSeconds(Math.Min(MaxDurationInSeconds, Math.Pow(2, attempt))));
+                sleepDurationProvider: attempt => TimeSpan.FromSeconds(Math.Min(RetryExecutionDurationInSeconds, Math.Pow(2, attempt))));
 
             sectionRetryPolicy = Policy.HandleInner<HttpRequestException>()
                 .OrResult<string>(res => !IsValidSection(res))
                 .WaitAndRetryAsync(
                    retryCount: 5,
-                   sleepDurationProvider: attempt => TimeSpan.FromSeconds(Math.Min(MaxDurationInSeconds, Math.Pow(2, attempt))));
+                   sleepDurationProvider: attempt => TimeSpan.FromSeconds(Math.Min(RetryExecutionDurationInSeconds, Math.Pow(2, attempt))));
 
             imageRetryPolicy = Policy.HandleInner<HttpRequestException>()
                 .OrResult<string>(res => !IsValidImage(res))
                 .WaitAndRetryAsync(
                    retryCount: 5,
-                   sleepDurationProvider: attempt => TimeSpan.FromSeconds(Math.Min(MaxDurationInSeconds, Math.Pow(2, attempt))));
+                   sleepDurationProvider: attempt => TimeSpan.FromSeconds(Math.Min(RetryExecutionDurationInSeconds, Math.Pow(2, attempt))));
         }
 
         public async Task<string> ExecuteImageWithRetryAsync(Func<Task<string>> action)
