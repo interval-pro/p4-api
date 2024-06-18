@@ -9,7 +9,7 @@ namespace PageBuilder.Core.Contracts
         
         Task<LayoutModel?> GenerateLayoutAsync(CreateLayoutModel inputs);
 
-        Task<SectionContent?> GenerateSectionAsync(AdintionalSectionModel sectionModel);
+        Task<SectionContent?> GenerateSectionAsync(AdditionalSectionModel sectionModel);
 
         Task<string> ImageColorExtractAsync(CreateLayoutModel jsonRequest);
     }

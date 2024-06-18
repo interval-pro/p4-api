@@ -20,9 +20,14 @@ namespace PageBuilder.WebApi.Controllers
         [HttpPost("generateLayout")]
         public async Task<IActionResult> GenerateLayoutAsync([FromBody] CreateLayoutModel inputs, [FromQuery] int engineType)
         {
-            if (engineType < 0 || engineType > 1)
+            if (!Enum.IsDefined(typeof(EngineType), engineType))
             {
                 return BadRequest("Invalid Engine type");
+            }
+
+            if (string.IsNullOrWhiteSpace(inputs.Input))
+            {
+                return BadRequest("Wrong data provided.");
             }
 
             try
@@ -34,7 +39,7 @@ namespace PageBuilder.WebApi.Controllers
 
                 if (result == null)
                 {
-                    return BadRequest();
+                    return BadRequest("Layout generation failed.");
                 }
 
                 return Ok(result);
@@ -47,11 +52,16 @@ namespace PageBuilder.WebApi.Controllers
         }
 
         [HttpPost("generateSection")]
-        public async Task<IActionResult> GenerateSectionAsync([FromBody] AdintionalSectionModel sectionModel, [FromQuery] int engineType)
+        public async Task<IActionResult> GenerateSectionAsync([FromBody] AdditionalSectionModel sectionModel, [FromQuery] int engineType)
         {
-            if (engineType < 0 || engineType > 1)
+            if (!Enum.IsDefined(typeof(EngineType), engineType))
             {
-                return BadRequest("Invalid Engine type");
+                return BadRequest("Invalid Engine type.");
+            }
+
+            if (string.IsNullOrWhiteSpace(sectionModel.InitialInputs))
+            {
+                return BadRequest("Wrong data provided.");
             }
 
             try
@@ -63,7 +73,7 @@ namespace PageBuilder.WebApi.Controllers
 
                 if (result == null)
                 {
-                    return BadRequest();
+                    return BadRequest("Section generation failed.");
                 }
 
                 return Ok(result);
@@ -74,23 +84,12 @@ namespace PageBuilder.WebApi.Controllers
             }
         }
 
-        [HttpPost("updateImage")]
-        public async Task<IActionResult> UpdateImage()
-        {
-            // To Do
-
-            var result = string.Empty;
-
-            return Ok(result);
-
-        }
-
         [HttpPost("imageColorsExtract")]
         public async Task<IActionResult> ImageColorsExtract([FromBody] CreateLayoutModel input, [FromQuery] int engineType)
         {
-            if (engineType < 0 || engineType > 1)
+            if (!Enum.IsDefined(typeof(EngineType), engineType))
             {
-                return BadRequest("Invalid Engine type");
+                return BadRequest("Invalid Engine type.");
             }
 
             try
@@ -102,7 +101,7 @@ namespace PageBuilder.WebApi.Controllers
 
                 if (result == null)
                 {
-                    return BadRequest();
+                    return BadRequest("Image colors extraction failed.");
                 }
 
                 return Ok(result);
@@ -116,9 +115,9 @@ namespace PageBuilder.WebApi.Controllers
         [HttpPost("imageGenerator")]
         public async Task<IActionResult> ImageGenerator([FromBody] CreateLayoutModel input, [FromQuery] int engineType)
         {
-            if (engineType < 0 || engineType > 1)
+            if (!Enum.IsDefined(typeof(EngineType), engineType))
             {
-                return BadRequest("Invalid Engine type");
+                return BadRequest("Invalid Engine type.");
             }
 
             try
@@ -130,7 +129,7 @@ namespace PageBuilder.WebApi.Controllers
 
                 if (result == null)
                 {
-                    return BadRequest();
+                    return BadRequest("Image generation failed");
                 }
 
                 return Ok(result);
