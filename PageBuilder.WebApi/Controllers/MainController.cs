@@ -25,7 +25,7 @@ namespace PageBuilder.WebApi.Controllers
                 return BadRequest("Invalid Engine type");
             }
 
-            if (string.IsNullOrWhiteSpace(inputs.Input))
+            if (string.IsNullOrWhiteSpace(inputs.Inputs))
             {
                 return BadRequest("Wrong data provided.");
             }
