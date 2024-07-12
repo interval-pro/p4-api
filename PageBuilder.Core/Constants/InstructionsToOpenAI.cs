@@ -17,9 +17,7 @@
         public const string botSectionInstructions = @"Instructions:  
         Use provided Section Information as raw simple referance and generate detailed section content. 
         Use input as main referance for all sections.   
-        You can use any css properties. 
-        For better deisgn you can use border-radius, background gradient, box-shadow, hover effects, animations etc..  
-        Reduce new lines between tags and styles in the code (minify). 
+        You can use any css properties.
         Procide only HTML and CSS style for current section.  
         Replace the imagesURL with: https://dummyimage.com/{width}x{heigh}/{color_hex} (width relative width,height, color)   
         Please Respond in the following JSON format:
