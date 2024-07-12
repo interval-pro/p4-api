@@ -96,9 +96,7 @@ namespace PageBuilder.Core.Services
             return string.Empty;
         }
 
-       
-
-        public async Task<string> CreateSectionAsync(IConfiguration configuration, string question, string section)
+        public async Task<string> CreateSectionAsync(IConfiguration configuration, string question, string section, Message styleMessage)
         {
             IHttpClientFactory? httpClientFactory = null;
             HttpClient httpClient = new HttpClient();
@@ -136,6 +134,8 @@ namespace PageBuilder.Core.Services
                     }
                 }
             };
+
+            completionRequest.Messages.Add(styleMessage);
 
             using var httpReq = new HttpRequestMessage(HttpMethod.Post, "https://api.openai.com/v1/chat/completions");
             httpReq.Headers.Add("Authorization", $"Bearer {configuration["aiApiKey"]}");

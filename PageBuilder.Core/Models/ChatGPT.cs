@@ -36,10 +36,10 @@ namespace PageBuilder.Core.Models
         public class Message
         {
             [JsonPropertyName("role")]
-            public string? Role { get; set; }
+            public string Role { get; set; } = string.Empty;
 
             [JsonPropertyName("content")]
-            public string? Content { get; set; }
+            public string Content { get; set; } = string.Empty;
         }
 
         public class ChatCompletionResponse

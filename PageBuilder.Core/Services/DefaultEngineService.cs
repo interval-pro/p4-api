@@ -4,6 +4,7 @@ using Newtonsoft.Json.Linq;
 using PageBuilder.Core.Contracts;
 using PageBuilder.Core.Models;
 using PageBuilder.Core.Models.ComponentModels;
+using static PageBuilder.Core.Models.ChatGPT;
 
 
 namespace PageBuilder.Core.Services
@@ -24,7 +25,7 @@ namespace PageBuilder.Core.Services
             this.retryPolicy = retryPolicy;
         }
 
-        public async Task<string> GenerateImageAsync(CreateLayoutModel jsonRequest)
+        public async Task<object> GenerateImageAsync(CreateLayoutModel jsonRequest)
         {
             var input = jsonRequest.Input;
             if (string.IsNullOrWhiteSpace(input))
@@ -50,7 +51,7 @@ namespace PageBuilder.Core.Services
             }
             //---- END ----
 
-            return JsonConvert.SerializeObject(new { url = imageUrl });
+            return new { url = imageUrl };
         }
 
         public async Task<LayoutModel?> GenerateLayoutAsync(CreateLayoutModel request)
@@ -79,9 +80,15 @@ namespace PageBuilder.Core.Services
   
         public async Task<SectionContent?> GenerateSectionAsync(AdditionalSectionModel sectionModel)
         {
+            Message styleMessage = new()
+            {
+                Role = "system",
+                Content = ""
+            };
+
             var section = JsonConvert.SerializeObject(sectionModel);
 
-            string sectionResponse = await retryPolicy.ExecuteSectionWithRetryAsync(() => openAiService.CreateSectionAsync(configuration, sectionModel.InitialInputs, section));
+            string sectionResponse = await retryPolicy.ExecuteSectionWithRetryAsync(() => openAiService.CreateSectionAsync(configuration, sectionModel.InitialInputs, section, styleMessage));
 
             if (string.IsNullOrEmpty(sectionResponse))
             {
