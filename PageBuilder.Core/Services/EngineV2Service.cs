@@ -79,33 +79,5 @@ namespace PageBuilder.Core.Services
         {
             throw new NotImplementedException();
         }
-
-        private static LayoutModel? ParseLayout(string layout, string input)
-        {
-            var obj = JObject.Parse(layout);
-
-            if (obj != null)
-            {
-                var layoutModel = new LayoutModel()
-                {
-                    Inputs = input,
-                    MainStyle = obj["mainStyle"]?.ToString(),
-                    Sections = obj["sections"]?.Select(s => new SectionModel()
-                    {
-                        SectionId = s["sectionId"]?.ToString(),
-                        Components = s["components"]?.Select(c => new ComponentModel()
-                        {
-                            ComponentId = c["componentId"]?.ToString(),
-                            Type = c["type"]?.ToString(),
-                            Content = c["content"]?.ToString()
-                        }).ToList()
-                    }).ToList()
-                };
-
-                return layoutModel;
-            }
-
-            return null;
-        }
     }
 }
