@@ -27,7 +27,7 @@ namespace PageBuilder.Core.Services
 
         public async Task<object> GenerateImageAsync(CreateLayoutModel jsonRequest)
         {
-            var input = jsonRequest.Input;
+            var input = jsonRequest.Inputs;
             if (string.IsNullOrWhiteSpace(input))
             {
                 return "Invalid input.";
@@ -56,7 +56,7 @@ namespace PageBuilder.Core.Services
 
         public async Task<LayoutModel?> GenerateLayoutAsync(CreateLayoutModel request)
         {
-            var input = request.Input;
+            var input = request.Inputs;
 
             string layout = string.Empty;
             try

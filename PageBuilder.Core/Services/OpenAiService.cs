@@ -52,7 +52,7 @@ namespace PageBuilder.Core.Services
             ChatCompletionRequest completionRequest = new()
             {
                 Model = "gpt-4o",
-                MaxTokens = 2000,
+                MaxTokens = 4000,
                 Messages =
                 {
                     new Message()
@@ -109,7 +109,7 @@ namespace PageBuilder.Core.Services
             ChatCompletionRequest completionRequest = new()
             {
                 Model = "gpt-4o",
-                MaxTokens = 2000,
+                MaxTokens = 4000,
                 Messages =
                 {
                     new Message()

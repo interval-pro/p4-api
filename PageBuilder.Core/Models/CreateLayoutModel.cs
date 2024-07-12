@@ -2,6 +2,6 @@
 {
     public class CreateLayoutModel
     {
-        public string Input { get; set; } = string.Empty;
+        public string Inputs { get; set; } = string.Empty;
     }
 }
