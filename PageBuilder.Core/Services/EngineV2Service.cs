@@ -1,12 +1,11 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using PageBuilder.Core.Contracts;
 using PageBuilder.Core.Models;
 using PageBuilder.Core.Models.ComponentModels;
-using static PageBuilder.Core.Models.ChatGPT;
 using static PageBuilder.Core.Constants.HeaderStyles;
-using PageBuilder.Core.Constants;
+using static PageBuilder.Core.Constants.HeroStyles;
+using static PageBuilder.Core.Models.ChatGPT;
 
 namespace PageBuilder.Core.Services
 {
@@ -40,22 +39,25 @@ namespace PageBuilder.Core.Services
         {
             string CssStyle = string.Empty;
             string targetSectionId = sectionModel.Section.SectionId;
+            int lastElement = 0, randomStyleIndex = 0;
 
             switch (targetSectionId)
             {
                 case "header":
                     string[] headerStyles = {HeaderStyle1, HeaderStyle2, HeaderStyle3 };
-                    int lastElement = headerStyles.Count() - 1;
-                    int randomStyleIndex = new Random().Next(0, lastElement);
+                    lastElement = headerStyles.Count() - 1;
+                    randomStyleIndex = new Random().Next(0, lastElement);
                     CssStyle = headerStyles[randomStyleIndex];
                     break;
                 case "hero":
-                    break;
-                case "footer":
+                    string[] heroStyles = { HeroStyle1, HeroStyle2, HeroStyle3 };
+                    lastElement = heroStyles.Count() - 1;
+                    randomStyleIndex = new Random().Next(0, lastElement);
+                    CssStyle = heroStyles[randomStyleIndex];
                     break;
             }
 
-            Message styleMessages = new()
+            Message styleMessage = new()
             {
                 Role = "system",
                 Content = $"For {targetSectionId} use exactly this CSS style without any changes: " + CssStyle
@@ -63,7 +65,7 @@ namespace PageBuilder.Core.Services
 
             var section = JsonConvert.SerializeObject(sectionModel);
 
-            string sectionResponse = await retryPolicy.ExecuteSectionWithRetryAsync(() => openAiService.CreateSectionAsync(configuration, sectionModel.InitialInputs, section, styleMessages));
+            string sectionResponse = await retryPolicy.ExecuteSectionWithRetryAsync(() => openAiService.CreateSectionAsync(configuration, sectionModel.InitialInputs, section, styleMessage));
 
             if (string.IsNullOrEmpty(sectionResponse))
             {

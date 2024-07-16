@@ -134,9 +134,9 @@ namespace PageBuilder.Core.Services
                     }
                 }
             };
-
+            //Add new message for style
             completionRequest.Messages.Add(styleMessage);
-
+            //---- END ----
             using var httpReq = new HttpRequestMessage(HttpMethod.Post, "https://api.openai.com/v1/chat/completions");
             httpReq.Headers.Add("Authorization", $"Bearer {configuration["aiApiKey"]}");
 

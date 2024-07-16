@@ -18,7 +18,8 @@
         Use provided Section Information as raw simple referance and generate detailed section content. 
         Use input as main referance for all sections.   
         You can use any css properties.
-        Procide only HTML and CSS style for current section.  
+        Procide only HTML and CSS style for current section.
+        Use exactly this structure for section Hero: <section id=""hero""><img class=""hero-bg""></img><div class=""hero-content""><h1></h1><p></p><button></button></div></section>
         Replace the imagesURL with: https://dummyimage.com/{width}x{heigh}/{color_hex} (width relative width,height, color)   
         Please Respond in the following JSON format:
         { ""HTML"": ""<_section_tag_></_section_tag_>"" , ""CSS"": ""_the_css_style_"" }
