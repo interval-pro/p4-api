@@ -10,7 +10,7 @@
         At least 5 sections. Please Respond in fallowing json format:
         {""inputs"":""__inputs_from_prompt__ as human readable text""
         ""mainStyle:""__CSS_style_for_body_and_html_tags_in_css_code__""
-        ""sections"": [{sectionId: ""header""
+        ""sections"": [{sectionId: ""header"", sectionId: ""hero"", ...
         ""components: [{componentId: ""logo"",  type: ""image"", content: ""GIFP(""..."")""},
         ""{componentId: ""navbar"", type: ""..."", content: ""5 links: Home, about us, ....""},... ]}, ...]}";
 
@@ -22,13 +22,9 @@
         Use exactly this structure for section Header: 
         <header id='header'>
         <img id='logo'>
-        <nav>
-            <ul>
-                <li><a></a></li>
-            </ul>
-        </nav>
+        <nav><ul><li><a></a></li></ul></nav>
         </header>
-        Use exactly this structure for section Hero: <section id=""hero""><img class=""hero-bg""></img><div class=""hero-content""><h1></h1><p></p><button></button></div></section>
+        Use exactly this structure for section Hero: <section id='hero'><img class='hero-bg'></img><div class='hero-content'><h1></h1><p></p><button></button></div></section>
         Replace the imagesURL with: https://dummyimage.com/{width}x{heigh}/{color_hex} (width relative width,height, color)   
         Please Respond in the following JSON format:
         { ""HTML"": ""<_section_tag_></_section_tag_>"" , ""CSS"": ""_the_css_style_"" }

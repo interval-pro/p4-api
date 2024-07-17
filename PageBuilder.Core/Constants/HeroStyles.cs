@@ -36,6 +36,7 @@
             width: 100%;
             height: 100vh;
             object-fit: cover;
+            filter: brightness(50%);
         }
 
         #hero button {
@@ -78,6 +79,7 @@
             width: 100%;
             height: 100vh;
             object-fit: cover;
+            filter: brightness(50%);
         }
 
         #hero button {
@@ -120,6 +122,7 @@
             width: 100%;
             height: 100vh;
             object-fit: cover;
+            filter: brightness(50%);
         }
 
         #hero button {
