@@ -5,6 +5,7 @@ using PageBuilder.Core.Contracts;
 using PageBuilder.Core.Models;
 using PageBuilder.Core.Models.ComponentModels;
 using static PageBuilder.Core.Models.ChatGPT;
+using HtmlAgilityPack;
 
 
 namespace PageBuilder.Core.Services
@@ -80,13 +81,41 @@ namespace PageBuilder.Core.Services
   
         public async Task<SectionContent?> GenerateSectionAsync(AdditionalSectionModel sectionModel)
         {
+            //Get all image descriptions and generate image/images for every component
+            string text = string.Join(", ", sectionModel.Section.Components.Select(x => x.Content).ToList());
+            List<string> imageSources = new List<string>();
+            while (text.Contains("GIFP"))
+            {
+                int startIndex = text.IndexOf("GIFP");
+                int endIndex = text.IndexOf(")") + 1;
+                string description = text.Substring(startIndex, endIndex - startIndex);
+                string imageSource = string.Empty;
+
+                try
+                {
+                    imageSource = await retryPolicy.ExecuteImageWithRetryAsync(() => openAiService.CreateImageFromTextAsync(configuration, description));
+                    
+                    if (string.IsNullOrEmpty(imageSource))
+                    {
+                        imageSource = @"https://dummyimage.com/1792x1024/fff5";
+                    }
+                }
+                catch
+                {
+
+                }
+                imageSources.Add(imageSource);
+                text = text.Replace(description, "");
+            }
+            //---- END ----
+
             Message styleMessage = new()
             {
                 Role = "system",
                 Content = ""
             };
 
-            var section = JsonConvert.SerializeObject(sectionModel);
+            var section = JsonConvert.SerializeObject(sectionModel.Section);
 
             string sectionResponse = await retryPolicy.ExecuteSectionWithRetryAsync(() => openAiService.CreateSectionAsync(configuration, sectionModel.InitialInputs, section, styleMessage));
 
@@ -95,9 +124,32 @@ namespace PageBuilder.Core.Services
                 return null;
             }
 
-            var result = JsonConvert.DeserializeObject<SectionContent>(sectionResponse);
+            var sectionContent = JsonConvert.DeserializeObject<SectionContent>(sectionResponse);
+            string html = sectionContent.HTML;
 
-            return result;
+            //Add generated image source to the right place
+            HtmlDocument htmlDocument = new HtmlDocument();
+            htmlDocument.LoadHtml(html);
+            var htmlNodes = htmlDocument.DocumentNode.SelectNodes("//img");
+            if (htmlNodes != null)
+            {
+                for (int i = 0; i < htmlNodes.Count; i++)
+                {
+                    var htmlNode = htmlNodes[i];
+                    var imgSrc = imageSources[i];
+                    
+                    htmlNode.Attributes["src"].Value = imgSrc;
+
+                    using (StringWriter writer = new StringWriter())
+                    {
+                        htmlDocument.Save(writer);
+                        sectionContent.HTML = writer.ToString();
+                    }
+                }
+            }
+            //---- END ----
+
+            return sectionContent;
         }
 
         public Task<string> ImageColorExtractAsync(CreateLayoutModel jsonRequest)
