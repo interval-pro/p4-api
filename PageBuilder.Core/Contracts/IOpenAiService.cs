@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using static PageBuilder.Core.Models.ChatGPT;
 
 namespace PageBuilder.Core.Contracts
 {
@@ -8,6 +9,6 @@ namespace PageBuilder.Core.Contracts
 
         Task<string> CreateLayoutAsync(IConfiguration configuration, string question);
 
-        Task<string> CreateSectionAsync(IConfiguration configuration, string question, string section);
+        Task<string> CreateSectionAsync(IConfiguration configuration, string question, string section, Message styleMessage);
     }
 }

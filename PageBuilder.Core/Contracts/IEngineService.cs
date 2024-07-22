@@ -5,7 +5,7 @@ namespace PageBuilder.Core.Contracts
 {
     public interface IEngineService
     {
-        Task<string> GenerateImageAsync(CreateLayoutModel jsonRequest);
+        Task<object> GenerateImageAsync(CreateLayoutModel jsonRequest);
         
         Task<LayoutModel?> GenerateLayoutAsync(CreateLayoutModel inputs);
 
