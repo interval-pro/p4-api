@@ -63,7 +63,7 @@ namespace PageBuilder.Core.Services
                 Content = $"For {targetSectionId} use exactly this CSS style without any changes: " + CssStyle
             };
 
-            var section = JsonConvert.SerializeObject(sectionModel);
+            var section = JsonConvert.SerializeObject(sectionModel.Section);
 
             string sectionResponse = await retryPolicy.ExecuteSectionWithRetryAsync(() => openAiService.CreateSectionAsync(configuration, sectionModel.InitialInputs, section, styleMessage));
 

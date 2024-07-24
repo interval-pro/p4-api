@@ -159,6 +159,8 @@ namespace PageBuilder.Core.Services
 
         private static LayoutModel? ParseLayout(string layout, string input)
         {
+            string importGoolgeFonts = @"@import url('https://fonts.googleapis.com/css2?family=Roboto&family=Raleway&family=Ubuntu&family=Oswald&display=swap');";
+
             var obj = JObject.Parse(layout);
 
             if (obj != null)
@@ -166,7 +168,7 @@ namespace PageBuilder.Core.Services
                 var layoutModel = new LayoutModel()
                 {
                     Inputs = input,
-                    MainStyle = obj["mainStyle"]?.ToString(),
+                    MainStyle = importGoolgeFonts + "  " + obj["mainStyle"]?.ToString(),
                     Sections = obj["sections"]?.Select(s => new SectionModel()
                     {
                         SectionId = s["sectionId"]?.ToString(),
