@@ -18,8 +18,17 @@ namespace PageBuilder.WebApi.Controllers
         }
 
         [HttpPost("generateLayout")]
-        public async Task<IActionResult> GenerateLayoutAsync([FromBody] CreateLayoutModel inputs, [FromQuery] int engineType)
+        public async Task<IActionResult> GenerateLayoutAsync([FromBody] CreateLayoutModel inputs, [FromQuery] int? engineType)
         {
+            try
+            {
+                var isEngineNull = Enum.IsDefined(typeof(EngineType), engineType);
+            }
+            catch (Exception x)
+            {
+                return BadRequest($"Invalid Engine type: {x.Message}");
+            }
+
             if (!Enum.IsDefined(typeof(EngineType), engineType))
             {
                 return BadRequest("Invalid Engine type");
@@ -52,8 +61,17 @@ namespace PageBuilder.WebApi.Controllers
         }
 
         [HttpPost("generateSection")]
-        public async Task<IActionResult> GenerateSectionAsync([FromBody] AdditionalSectionModel sectionModel, [FromQuery] int engineType)
+        public async Task<IActionResult> GenerateSectionAsync([FromBody] AdditionalSectionModel sectionModel, [FromQuery] int? engineType)
         {
+            try
+            {
+                var isEngineNull = Enum.IsDefined(typeof(EngineType), engineType);
+            }
+            catch (Exception x)
+            {
+                return BadRequest($"Invalid Engine type: {x.Message}");
+            }
+
             if (!Enum.IsDefined(typeof(EngineType), engineType))
             {
                 return BadRequest("Invalid Engine type.");
@@ -85,8 +103,17 @@ namespace PageBuilder.WebApi.Controllers
         }
 
         [HttpPost("imageColorsExtract")]
-        public async Task<IActionResult> ImageColorsExtract([FromBody] CreateLayoutModel input, [FromQuery] int engineType)
+        public async Task<IActionResult> ImageColorsExtract([FromBody] CreateLayoutModel input, [FromQuery] int? engineType)
         {
+            try
+            {
+                var isEngineNull = Enum.IsDefined(typeof(EngineType), engineType);
+            }
+            catch (Exception x)
+            {
+                return BadRequest($"Invalid Engine type: {x.Message}");
+            }
+
             if (!Enum.IsDefined(typeof(EngineType), engineType))
             {
                 return BadRequest("Invalid Engine type.");
@@ -113,8 +140,17 @@ namespace PageBuilder.WebApi.Controllers
         }
 
         [HttpPost("imageGenerator")]
-        public async Task<IActionResult> ImageGenerator([FromBody] CreateLayoutModel input, [FromQuery] int engineType)
+        public async Task<IActionResult> ImageGenerator([FromBody] CreateLayoutModel input, [FromQuery] int? engineType)
         {
+            try
+            {
+                var isEngineNull = Enum.IsDefined(typeof(EngineType), engineType);
+            }
+            catch (Exception x)
+            {
+                return BadRequest($"Invalid Engine type: {x.Message}");
+            }
+
             if (!Enum.IsDefined(typeof(EngineType), engineType))
             {
                 return BadRequest("Invalid Engine type.");
