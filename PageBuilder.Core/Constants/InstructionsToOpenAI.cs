@@ -13,7 +13,7 @@
         ""sections"": [{sectionId: ""header"", sectionId: ""hero"", ...
         ""components: [{componentId: ""logo"",  type: ""image"", content: ""GIFP(""..."")""},
         ""{componentId: ""navbar"", type: ""..."", content: ""5 links: Home, about us, ....""},... ]}, ...]}
-        For content just use string, no array.";
+        For content just use string, no array and for multiple images give me a multiple GIFP.";
 
         public const string botSectionInstructions = @"Instructions:  
         Use provided Section Information as raw simple referance and generate detailed section content. 
