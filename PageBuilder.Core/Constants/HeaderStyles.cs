@@ -3,7 +3,6 @@
     public static class HeaderStyles
     {
         public static string HeaderStyle1 = @"
-              @import url(""https://fonts.googleapis.com/css2?family=Roboto&family=Raleway&family=Ubuntu&family=Oswald&display=swap"");
               #header {
             width: 95%;
             height: 5em;
@@ -46,24 +45,26 @@
         #header #logo {
             width: 160px;
             height: 110px;
-            object-fit: contain;
+            object-fit: cover;
             border-radius: 0px 7px;
             position: relative;
             left: 2em;
         }";
 
-        public static string HeaderStyle2 = @"@import url(""""https://fonts.googleapis.com/css2?family=Roboto&family=Raleway&family=Ubuntu&family=Oswald&display=swap"""");
+        public static string HeaderStyle2 = @"
               #header {
-            width: 95%;
+            width: 97%;
             height: 5em;
             opacity: 0.8;
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-start;
+            align-items: center;
             position: absolute;
-            background-color: darkslategrey;
+            background-color: transparent;
             margin: 10px;
             padding: 10px;
             border-radius: 0px 7px;
+            gap: 20px;
             z-index: 1;
         }
 
@@ -77,41 +78,46 @@
 
         #header nav ul li a {
             text-decoration: none;
-            font-family: ""Raleway"";
+            font-family: 'Ubuntu';
             font-size: large;
+            transition: font-size 0.5s;
             font-weight: 400;
             background-color: transparent;
-            color: wheat;
+            color: white;
             padding: 8px;
-            border: 2px solid wheat;
-            border-radius: 0px 7px;
+            border: 0px solid transparent;
+            border-radius: 5%;
         }
 
         #header nav ul li a:hover {
-            background-color: wheat;
-            color: black;
+            color: white;
+            font-size: xx-large;
         }
 
         #header #logo {
             width: 160px;
             height: 110px;
-            object-fit: contain;
-            border-radius: 0px 7px;
+            object-fit: cover;
+            border-radius: 5%;
             position: relative;
             left: 2em;
         }";
-        public static string HeaderStyle3 = @"@import url(""https://fonts.googleapis.com/css2?family=Roboto&family=Raleway&family=Ubuntu&family=Oswald&display=swap"");
+        public static string HeaderStyle3 = @"
               #header {
-            width: 95%;
+            width: 97%;
             height: 5em;
             opacity: 0.8;
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
+            align-items: center;
             position: absolute;
-            background-color: darkslategrey;
+            background-color: transparent;
             margin: 10px;
             padding: 10px;
-            border-radius: 0px 7px;
+            border-radius: 7px 7px;
+            border: 0px solid whitesmoke;
+            border-width: 3px 0px 3px 0px;
+            gap: 20px;
             z-index: 1;
         }
 
@@ -125,26 +131,27 @@
 
         #header nav ul li a {
             text-decoration: none;
-            font-family: ""Oswald"";
+            font-family: 'Oswald';
             font-size: large;
             font-weight: 400;
             background-color: transparent;
-            color: wheat;
+            color: white;
             padding: 8px;
-            border: 2px solid wheat;
-            border-radius: 0px 7px;
+            border: 0px solid transparent;
+            border-radius: 5%;
         }
 
         #header nav ul li a:hover {
-            background-color: wheat;
-            color: black;
+            color: white;
+            text-decoration: underline;
         }
 
         #header #logo {
             width: 160px;
             height: 110px;
-            object-fit: contain;
-            border-radius: 0px 7px;
+            transition: font-size 0.5s;
+            object-fit: cover;
+            border-radius: 5%;
             position: relative;
             left: 2em;
         }";
