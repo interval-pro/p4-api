@@ -26,6 +26,7 @@
         <nav><ul><li><a></a></li></ul></nav>
         </header>
         Use exactly this structure for section Hero: <section id='hero'><img class='hero-bg'></img><div class='hero-content'><h1></h1><p></p><button></button></div></section>
+        Make sure for every image use GIFP(""__human readable text describing the image - prompt for image__"")
         Please Respond in the following JSON format:
         { ""HTML"": ""<_section_tag_></_section_tag_>"" , ""CSS"": ""_the_css_style_"" }
         Generete it as detailed as possible.";
