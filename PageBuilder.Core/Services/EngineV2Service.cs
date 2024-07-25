@@ -3,9 +3,9 @@ using Newtonsoft.Json;
 using PageBuilder.Core.Contracts;
 using PageBuilder.Core.Models;
 using PageBuilder.Core.Models.ComponentModels;
+using PageBuilder.Core.Utilities;
 using static PageBuilder.Core.Constants.HeaderStyles;
 using static PageBuilder.Core.Constants.HeroStyles;
-using static PageBuilder.Core.Models.ChatGPT;
 
 namespace PageBuilder.Core.Services
 {
@@ -30,9 +30,27 @@ namespace PageBuilder.Core.Services
             throw new NotImplementedException();
         }
 
-        public async Task<LayoutModel?> GenerateLayoutAsync(CreateLayoutModel jsonRequest)
+        public async Task<LayoutModel?> GenerateLayoutAsync(CreateLayoutModel request)
         {
-            throw new NotImplementedException();
+            var input = request.Inputs;
+
+            string layout = string.Empty;
+            try
+            {
+                layout = await retryPolicy.ExecuteLayoutWithRetryAsync(() => openAiService.CreateLayoutAsync(configuration, input));
+
+                if (string.IsNullOrEmpty(layout))
+                {
+                    return null;
+                }
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+
+            LayoutModel? layoutModel = SharedFunctions.ParseLayout(layout, input);
+            return layoutModel;
         }
 
         public async Task<SectionContent?> GenerateSectionAsync(AdditionalSectionModel sectionModel)
@@ -44,7 +62,7 @@ namespace PageBuilder.Core.Services
             switch (targetSectionId)
             {
                 case "header":
-                    string[] headerStyles = {HeaderStyle1, HeaderStyle2, HeaderStyle3 };
+                    string[] headerStyles = { HeaderStyle1, HeaderStyle2, HeaderStyle3 };
                     lastElement = headerStyles.Count() - 1;
                     randomStyleIndex = new Random().Next(0, lastElement);
                     CssStyle = headerStyles[randomStyleIndex];
@@ -55,31 +73,42 @@ namespace PageBuilder.Core.Services
                     randomStyleIndex = new Random().Next(0, lastElement);
                     CssStyle = heroStyles[randomStyleIndex];
                     break;
+                default:
+                    CssStyle = string.Empty;
+                    break;
             }
 
-            Message styleMessage = new()
+            string messageContent = string.Empty;
+            if (!string.IsNullOrEmpty(CssStyle))
             {
-                Role = "system",
-                Content = $"For {targetSectionId} use exactly this CSS style without any changes: " + CssStyle
-            };
+                messageContent = $"For {targetSectionId} use exactly this CSS style without any changes: {CssStyle}";
+            }
 
             var section = JsonConvert.SerializeObject(sectionModel);
 
-            string sectionResponse = await retryPolicy.ExecuteSectionWithRetryAsync(() => openAiService.CreateSectionAsync(configuration, sectionModel.InitialInputs, section, styleMessage));
+            string sectionResponse = await retryPolicy.ExecuteSectionWithRetryAsync(() => openAiService.CreateSectionAsync(configuration, sectionModel.InitialInputs, section, messageContent));
 
             if (string.IsNullOrEmpty(sectionResponse))
             {
                 return null;
             }
 
-            var result = JsonConvert.DeserializeObject<SectionContent>(sectionResponse);
+            var sectionContent = JsonConvert.DeserializeObject<SectionContent>(sectionResponse);
 
-            return result;
+            string html = sectionContent!.HTML;
+            if (html.Contains("img"))
+            {
+                var parsedSection = await SharedFunctions.HandleSectionImageTags(sectionContent, retryPolicy, openAiService, configuration);
+
+                return parsedSection;
+            }
+
+            return sectionContent;
         }
 
         public Task<string> ImageColorExtractAsync(CreateLayoutModel jsonRequest)
         {
             throw new NotImplementedException();
-        }
+        } 
     }
 }
