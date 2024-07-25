@@ -16,6 +16,9 @@ namespace PageBuilder.Core.Models
             [JsonPropertyName("max_tokens")]
             public int MaxTokens { get; set; }
 
+            [JsonPropertyName("response_format")]
+            public object ResponseFormat { get; set; }
+
         }
 
         public class Choice
