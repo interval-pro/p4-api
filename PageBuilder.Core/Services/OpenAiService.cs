@@ -53,6 +53,7 @@ namespace PageBuilder.Core.Services
             {
                 Model = "gpt-4o",
                 MaxTokens = 4000,
+                ResponseFormat = new { type = "json_object" },
                 Messages =
                 {
                     new Message()
@@ -83,20 +84,12 @@ namespace PageBuilder.Core.Services
             httpResponse.EnsureSuccessStatusCode();
 
             var completionResponse = httpResponse.IsSuccessStatusCode ? JsonSerializer.Deserialize<ChatCompletionResponse>(await httpResponse.Content.ReadAsStringAsync()) : null;
-            string result = completionResponse.Choices?[0]?.Message?.Content;
+            string result = completionResponse.Choices?[0]?.Message?.Content!;
 
-            var startIndex = result.IndexOf('{');
-            var endIndex = result.LastIndexOf("```");
-
-            if (startIndex > -1 && endIndex > -1 && endIndex > startIndex)
-            {
-                return result.Substring(startIndex, endIndex - startIndex - 1);
-            }
-
-            return string.Empty;
+            return result;
         }
 
-        public async Task<string> CreateSectionAsync(IConfiguration configuration, string question, string section, Message styleMessage)
+        public async Task<string> CreateSectionAsync(IConfiguration configuration, string question, string section, string messageContent)
         {
             IHttpClientFactory? httpClientFactory = null;
             HttpClient httpClient = new HttpClient();
@@ -110,6 +103,7 @@ namespace PageBuilder.Core.Services
             {
                 Model = "gpt-4o",
                 MaxTokens = 4000,
+                ResponseFormat = new { type = "json_object" },
                 Messages =
                 {
                     new Message()
@@ -134,9 +128,18 @@ namespace PageBuilder.Core.Services
                     }
                 }
             };
-            //Add new message for style
-            completionRequest.Messages.Add(styleMessage);
-            //---- END ----
+
+            if (!string.IsNullOrEmpty(messageContent))
+            {
+                var message = new Message()
+                {
+                    Role = "system",
+                    Content = messageContent
+                };
+
+                completionRequest.Messages.Insert(2, message);
+            }
+
             using var httpReq = new HttpRequestMessage(HttpMethod.Post, "https://api.openai.com/v1/chat/completions");
             httpReq.Headers.Add("Authorization", $"Bearer {configuration["aiApiKey"]}");
 
@@ -152,9 +155,8 @@ namespace PageBuilder.Core.Services
                 return string.Empty;
             }
 
-            string result = completionResponse.Choices?[0]?.Message?.Content;
-
-            return result.Replace("```json", "").Replace("```", "");
+            string result = completionResponse.Choices?[0]?.Message?.Content!;
+            return result;
         }
     }
 }
