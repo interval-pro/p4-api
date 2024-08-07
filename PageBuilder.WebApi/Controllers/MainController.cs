@@ -112,13 +112,20 @@ namespace PageBuilder.WebApi.Controllers
             }
         }
 
-        [HttpPost("imageGenerator")]
-        public async Task<IActionResult> ImageGenerator([FromBody] CreateLayoutModel input, [FromQuery] int engineType)
+        [HttpPost("regenerateImage")]
+        public async Task<IActionResult> RegenerateImage([FromBody] RegenerateImageModel inputs, [FromQuery] int engineType)
         {
             if (!Enum.IsDefined(typeof(EngineType), engineType))
             {
                 return BadRequest("Invalid Engine type.");
             }
+
+            if (string.IsNullOrEmpty(inputs.Prompt))
+            {
+                return BadRequest("Image prompt is required.");
+            }
+
+            var input = $"Use provided Context as simple reference: {inputs.Context}; and use {inputs.Prompt} to create an image.";
 
             try
             {
