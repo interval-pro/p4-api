@@ -22,7 +22,7 @@
         Procide only HTML and CSS style for current section.
         Use exactly this structure for section Header: 
         <header id='header'>
-        <img id='logo'>
+        <img id='logo' src=GIFP(""__human readable text describing the image - prompt for image__"")>
         <nav><ul><li><a></a></li></ul></nav>
         </header>
         Use exactly this structure for section Hero: <section id='hero'><img class='hero-bg'></img><div class='hero-content'><h1></h1><p></p><button></button></div></section>
