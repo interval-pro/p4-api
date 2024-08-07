@@ -8,7 +8,13 @@ namespace PageBuilder.Core.Services
 {
     public class OpenAiService : IOpenAiService
     {
-        public async Task<string> CreateImageFromTextAsync(IConfiguration configuration, string question)
+        private readonly IConfiguration configuration;
+        public OpenAiService(IConfiguration _configuration)
+        {
+            this.configuration = _configuration;
+        }
+
+        public async Task<string> CreateImageFromTextAsync(string question)
         {
             IHttpClientFactory? httpClientFactory = null;
             HttpClient httpClient = new HttpClient();
@@ -39,7 +45,7 @@ namespace PageBuilder.Core.Services
             return completionResponse.Data?[0]?.Url;
         }
 
-        public async Task<string> CreateLayoutAsync(IConfiguration configuration, string question)
+        public async Task<string> CreateLayoutAsync(string question)
         {
             IHttpClientFactory? httpClientFactory = null;
             HttpClient httpClient = new HttpClient();
@@ -89,7 +95,7 @@ namespace PageBuilder.Core.Services
             return result;
         }
 
-        public async Task<string> CreateSectionAsync(IConfiguration configuration, string question, string section, string messageContent)
+        public async Task<string> CreateSectionAsync(string question, string section, string messageContent)
         {
             IHttpClientFactory? httpClientFactory = null;
             HttpClient httpClient = new HttpClient();
