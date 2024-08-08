@@ -2,6 +2,6 @@
 {
     public static class GeneralConstants
     {
-        public const int RetryExecutionDurationInSeconds = 30;
+        public const int RetryExecutionDurationInSeconds = 60;
     }
 }

@@ -48,16 +48,9 @@ namespace PageBuilder.Core.Services
             var input = request.Inputs;
 
             string layout = string.Empty;
-            try
-            {
-                layout = await retryPolicy.ExecuteLayoutWithRetryAsync(() => openAiService.CreateLayoutAsync(input));
+            layout = await retryPolicy.ExecuteLayoutWithRetryAsync(() => openAiService.CreateLayoutAsync(input));
 
-                if (string.IsNullOrEmpty(layout))
-                {
-                    return null;
-                }
-            }
-            catch (Exception)
+            if (string.IsNullOrEmpty(layout))
             {
                 return null;
             }
@@ -85,7 +78,7 @@ namespace PageBuilder.Core.Services
             if (html.Contains("img"))
             {
                 var parsedSection = await SharedFunctions.HandleSectionImageTags(sectionContent, retryPolicy, openAiService);
-               
+
                 return parsedSection;
             }
 
