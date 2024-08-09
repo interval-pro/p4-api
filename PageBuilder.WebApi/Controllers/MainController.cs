@@ -140,7 +140,7 @@ namespace PageBuilder.WebApi.Controllers
         }
 
         [HttpPost("imageGenerator")]
-        public async Task<IActionResult> ImageGenerator([FromBody] CreateLayoutModel input, [FromQuery] int engineType)
+        public async Task<IActionResult> ImageGenerator([FromBody] RegenerateImageModel inputs, [FromQuery] int engineType)
         {
             if (!Enum.IsDefined(typeof(EngineType), engineType))
             {
