@@ -139,8 +139,8 @@ namespace PageBuilder.WebApi.Controllers
             }
         }
 
-        [HttpPost("imageGenerator")]
-        public async Task<IActionResult> ImageGenerator([FromBody] RegenerateImageModel inputs, [FromQuery] int engineType)
+        [HttpPost("regenerateImage")]
+        public async Task<IActionResult> RegenerateImage([FromBody] RegenerateImageModel inputs, [FromQuery] int engineType)
         {
             if (!Enum.IsDefined(typeof(EngineType), engineType))
             {
