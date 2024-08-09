@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using PageBuilder.Core.Contracts;
 using PageBuilder.Core.Models;
 using PageBuilder.Core.Models.ComponentModels;
@@ -11,23 +10,38 @@ namespace PageBuilder.Core.Services
 {
     public class EngineV2Service : IEngineService
     {
-        private readonly IConfiguration configuration;
         private readonly IOpenAiService openAiService;
         private readonly IRetryPolicyService retryPolicy;
 
         public EngineV2Service(
-            IConfiguration configuration,
             IOpenAiService openAiService,
             IRetryPolicyService retryPolicy)
         {
-            this.configuration = configuration;
             this.openAiService = openAiService;
             this.retryPolicy = retryPolicy;
         }
 
-        public Task<object> GenerateImageAsync(CreateLayoutModel jsonRequest)
+        public async Task<object> GenerateImageAsync(string input)
         {
-            throw new NotImplementedException();
+            string imageUrl = string.Empty;
+
+            //Generate Image with DALL-E-3
+            try
+            {
+                imageUrl = await retryPolicy.ExecuteImageWithRetryAsync(() => openAiService.CreateImageFromTextAsync(input));
+
+                if (string.IsNullOrEmpty(imageUrl))
+                {
+                    return "Failed to generate image";
+                }
+            }
+            catch (Exception x)
+            {
+                return x.Message;
+            }
+            //---- END ----
+
+            return new { url = imageUrl };
         }
 
         public async Task<LayoutModel?> GenerateLayoutAsync(CreateLayoutModel request)
@@ -37,7 +51,7 @@ namespace PageBuilder.Core.Services
             string layout = string.Empty;
             try
             {
-                layout = await retryPolicy.ExecuteLayoutWithRetryAsync(() => openAiService.CreateLayoutAsync(configuration, input));
+                layout = await retryPolicy.ExecuteLayoutWithRetryAsync(() => openAiService.CreateLayoutAsync(input));
 
                 if (string.IsNullOrEmpty(layout))
                 {
@@ -86,7 +100,7 @@ namespace PageBuilder.Core.Services
 
             var section = JsonConvert.SerializeObject(sectionModel.Section);
 
-            string sectionResponse = await retryPolicy.ExecuteSectionWithRetryAsync(() => openAiService.CreateSectionAsync(configuration, sectionModel.InitialInputs, section, messageContent));
+            string sectionResponse = await retryPolicy.ExecuteSectionWithRetryAsync(() => openAiService.CreateSectionAsync(sectionModel.InitialInputs!, section, messageContent));
 
             if (string.IsNullOrEmpty(sectionResponse))
             {
@@ -98,7 +112,7 @@ namespace PageBuilder.Core.Services
             string html = sectionContent!.HTML;
             if (html.Contains("img"))
             {
-                var parsedSection = await SharedFunctions.HandleSectionImageTags(sectionContent, retryPolicy, openAiService, configuration);
+                var parsedSection = await SharedFunctions.HandleSectionImageTags(sectionContent, retryPolicy, openAiService);
 
                 return parsedSection;
             }

@@ -1,5 +1,4 @@
 ﻿using HtmlAgilityPack;
-using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 using PageBuilder.Core.Contracts;
 using PageBuilder.Core.Models;
@@ -12,8 +11,7 @@ namespace PageBuilder.Core.Utilities
         public static async Task<SectionContent> HandleSectionImageTags(
            SectionContent sectionContent,
            IRetryPolicyService retryPolicy,
-           IOpenAiService openAiService,
-           IConfiguration configuration)
+           IOpenAiService openAiService)
         {
             var html = sectionContent.HTML;
 
@@ -30,10 +28,16 @@ namespace PageBuilder.Core.Utilities
             for (int i = 0; i < htmlNodes.Count; i++)
             {
                 var htmlNode = htmlNodes[i];
+
+                if(htmlNode.Attributes["src"] == null)
+                {
+                    continue;
+                }
+
                 var imageDescription = htmlNode.Attributes["src"].Value;
 
                 var imageUrl = await retryPolicy.ExecuteImageWithRetryAsync(
-                    () => openAiService.CreateImageFromTextAsync(configuration, imageDescription));
+                    () => openAiService.CreateImageFromTextAsync(imageDescription));
 
                 if (string.IsNullOrEmpty(imageUrl))
                 {

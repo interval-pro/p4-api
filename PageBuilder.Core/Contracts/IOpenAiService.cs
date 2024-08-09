@@ -1,13 +1,11 @@
-﻿using Microsoft.Extensions.Configuration;
-
-namespace PageBuilder.Core.Contracts
+﻿namespace PageBuilder.Core.Contracts
 {
     public interface IOpenAiService
     {
-        Task<string> CreateImageFromTextAsync(IConfiguration conf, string question);
+        Task<string> CreateImageFromTextAsync(string question);
 
-        Task<string> CreateLayoutAsync(IConfiguration configuration, string question);
+        Task<string> CreateLayoutAsync(string question);
 
-        Task<string> CreateSectionAsync(IConfiguration configuration, string question, string section, string messageContent);
+        Task<string> CreateSectionAsync(string question, string section, string messageContent);
     }
 }

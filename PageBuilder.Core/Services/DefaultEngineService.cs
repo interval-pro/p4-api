@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using PageBuilder.Core.Contracts;
 using PageBuilder.Core.Models;
 using PageBuilder.Core.Models.ComponentModels;
@@ -10,34 +9,25 @@ namespace PageBuilder.Core.Services
 {
     public class DefaultEngineService : IEngineService
     {
-        private readonly IConfiguration configuration;
         private readonly IOpenAiService openAiService;
         private readonly IRetryPolicyService retryPolicy;
 
         public DefaultEngineService(
-            IConfiguration configuration,
             IOpenAiService openAiService,
             IRetryPolicyService retryPolicy)
         {
-            this.configuration = configuration;
             this.openAiService = openAiService;
             this.retryPolicy = retryPolicy;
         }
 
-        public async Task<object> GenerateImageAsync(CreateLayoutModel jsonRequest)
+        public async Task<object> GenerateImageAsync(string input)
         {
-            var input = jsonRequest.Inputs;
-            if (string.IsNullOrWhiteSpace(input))
-            {
-                return "Invalid input.";
-            }
-
             string imageUrl = string.Empty;
 
             //Generate Image with DALL-E-3
             try
             {
-                imageUrl = await retryPolicy.ExecuteImageWithRetryAsync(() => openAiService.CreateImageFromTextAsync(configuration, input));
+                imageUrl = await retryPolicy.ExecuteImageWithRetryAsync(() => openAiService.CreateImageFromTextAsync(input));
 
                 if (string.IsNullOrEmpty(imageUrl))
                 {
@@ -58,16 +48,9 @@ namespace PageBuilder.Core.Services
             var input = request.Inputs;
 
             string layout = string.Empty;
-            try
-            {
-                layout = await retryPolicy.ExecuteLayoutWithRetryAsync(() => openAiService.CreateLayoutAsync(configuration, input));
+            layout = await retryPolicy.ExecuteLayoutWithRetryAsync(() => openAiService.CreateLayoutAsync(input));
 
-                if (string.IsNullOrEmpty(layout))
-                {
-                    return null;
-                }
-            }
-            catch (Exception)
+            if (string.IsNullOrEmpty(layout))
             {
                 return null;
             }
@@ -82,7 +65,7 @@ namespace PageBuilder.Core.Services
             var section = JsonConvert.SerializeObject(sectionModel.Section);
 
             var messageContetn = string.Empty;
-            string sectionResponse = await retryPolicy.ExecuteSectionWithRetryAsync(() => openAiService.CreateSectionAsync(configuration, sectionModel.InitialInputs, section, messageContetn));
+            string sectionResponse = await retryPolicy.ExecuteSectionWithRetryAsync(() => openAiService.CreateSectionAsync(sectionModel.InitialInputs!, section, messageContetn));
 
             if (string.IsNullOrEmpty(sectionResponse))
             {
@@ -94,8 +77,8 @@ namespace PageBuilder.Core.Services
             string html = sectionContent!.HTML;
             if (html.Contains("img"))
             {
-                var parsedSection = await SharedFunctions.HandleSectionImageTags(sectionContent, retryPolicy, openAiService, configuration);
-               
+                var parsedSection = await SharedFunctions.HandleSectionImageTags(sectionContent, retryPolicy, openAiService);
+
                 return parsedSection;
             }
 
