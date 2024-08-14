@@ -4,9 +4,6 @@ namespace PageBuilder.Core.Models
 {
     public class ChatGPT
     {
-        /// <summary>
-        /// Create model for text response
-        /// </summary>
         public class ChatCompletionRequest
         {
             [JsonPropertyName("model")]
@@ -81,9 +78,6 @@ namespace PageBuilder.Core.Models
             public int TotalTokens { get; set; }
         }
 
-        /// <summary>
-        /// Create model for image response (Dall-e-3)
-        /// </summary>
         public class TextToImageRequest
         {
             [JsonPropertyName("model")]
@@ -91,11 +85,11 @@ namespace PageBuilder.Core.Models
             [JsonPropertyName("prompt")]
             public string Prompt { get; set; } = string.Empty;
             [JsonPropertyName("n")]
-            public int N { get; set; } //You can request 1 image at a time with DALL·E 3 (request more by making parallel requests) or up to 10 images at a time using DALL·E 2
+            public int N { get; set; }
             [JsonPropertyName("size")]
-            public string? Size { get; set; } //When using DALL·E 3, images can have a size of 1024x1024, 1024x1792 or 1792x1024 pixels.
+            public string? Size { get; set; }
             [JsonPropertyName("response_format")]
-            public string? ResponseFormat { get; set; } //The format in which the generated images are returned. Must be one of url or b64_json. URLs are only valid for 60 minutes after the image has been generated.
+            public string? ResponseFormat { get; set; }
         }
 
         public class Data

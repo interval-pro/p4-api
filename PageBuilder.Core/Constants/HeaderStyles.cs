@@ -148,7 +148,5 @@
             position: relative;
             left: 2em;
         }";
-        //public const string HeaderStyle4 = @"st4";
-        //public const string HeaderStyle5 = @"st5";
     }
 }

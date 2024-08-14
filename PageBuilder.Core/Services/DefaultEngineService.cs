@@ -24,7 +24,6 @@ namespace PageBuilder.Core.Services
         {
             string imageUrl = string.Empty;
 
-            //Generate Image with DALL-E-3
             try
             {
                 imageUrl = await retryPolicy.ExecuteImageWithRetryAsync(() => openAiService.CreateImageFromTextAsync(input));
@@ -38,7 +37,6 @@ namespace PageBuilder.Core.Services
             {
                 return x.Message;
             }
-            //---- END ----
 
             return new { url = imageUrl };
         }
@@ -83,11 +81,6 @@ namespace PageBuilder.Core.Services
             }
 
             return sectionContent;
-        }
-
-        public Task<string> ImageColorExtractAsync(CreateLayoutModel jsonRequest)
-        {
-            throw new NotImplementedException();
         }
     }
 }
